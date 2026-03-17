@@ -11,8 +11,8 @@ class Logger():
         pass
 
     class level(Enum):
-        DEBUG = 1,
-        INFO = 2,
+        DEBUG = 1
+        INFO = 2
         ERROR = 3
 
     def debug(self, message: str):

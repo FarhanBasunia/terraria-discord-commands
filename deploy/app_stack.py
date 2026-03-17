@@ -96,7 +96,7 @@ class AppStack(Stack):
             allow_test_invoke=True,
         )
 
-        interactions.add_method("POST", aws_apigateway.LambdaIntegration(lambda_integration))
+        interactions.add_method("POST", lambda_integration)
 
         CfnOutput(self, "DiscordWebhookURL", value=f"{api_gateway.url}interactions")
 

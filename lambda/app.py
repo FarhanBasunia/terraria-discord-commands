@@ -4,39 +4,50 @@ import logging
 import os
 import traceback
 
-from lib.make_response import make_response
+from lib.util.make_response import make_response
+from lib.util.verify_signature import verify_signature
+from lib.command_handler import command_handler
 from lib.logger import Logger
 
 logger = Logger(__name__)
+DISCORD_PUBLIC_KEY = os.environ["DISCORD_PUBLIC_KEY"]
+EC2_INSTANCE_ID = os.environ["EC2_INSTANCE_ID"]
 
 
 def lambda_handler(event, context):
     status = False
     try:
-        body_raw = event.get("body") or "{}"
-        if event.get("isBase64Encoded"):
-            body_raw = base64.b64decode(body_raw).decode("utf-8")
-
-        body = json.loads(body_raw)
-
         logger.info(f"Event: {event}")
-        if body.get("type") == 1:
+
+        signature_verification, body = verify_signature(event, DISCORD_PUBLIC_KEY)
+
+        if not signature_verification:
+            return make_response(401, {"error": "Invalid signature"})
+
+        body = json.loads(body)
+        interaction_type = body.get("type")
+        # Discord ping
+        if interaction_type == 1:
             logger.debug("returning ping")
             status = True
             return make_response(200, {"type": 1})
 
-        if body.get("type") == 2:
+        elif interaction_type == 2:
+            command_name = body["data"]["name"]
+            app_id = body["application_id"]
+            token = body["token"]
+            interaction_id = body["id"]
+            
+
             status = True
-            return make_response(200, {"type": 4, "data": {"content": "test_success"}})
+            command_handler(command_name, app_id, token, interaction_id, EC2_INSTANCE_ID)
 
         logger.info(f"Unknown interaction type: {body.get('type')}")
-        # Respond with a PONG for any unrecognized payload to keep Discord happy.
-        return make_response(200, {"type": 1})
+        return make_response(400, {"error": "Unknown request"})
 
     except Exception as exp:
         logger.error(f"Exception encountered: {str(exp)}")
         logger.error(traceback.format_exc())
-        # Ensure we still send a valid JSON response to avoid failures during endpoint verification
         return make_response(500, {"type": 4, "data": {"content": "Internal error"}})
     finally:
         logger.write(status)
