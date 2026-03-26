@@ -21,7 +21,7 @@ class AppStack(Stack):
         env_vars = {
             "DISCORD_PUBLIC_KEY": os.getenv("DISCORD_PUBLIC_KEY", "<err>"),
             "EC2_INSTANCE_ID": os.getenv("EC2_INSTANCE_ID", "<err>"),
-            "LOG_LEVEL": os.getenv("LOG_LEVEL", "INFO")
+            "LOG_LEVEL": os.getenv("LOG_LEVEL", "ERROR")
         }
 
         for item in env_vars:
