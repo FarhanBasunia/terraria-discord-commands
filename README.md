@@ -102,14 +102,6 @@ python .\util\terraria-commands.py list
 python .\util\terraria-commands.py delete
 ```
 
-## Local Smoke Check
-
-You can run:
-
-```powershell
-python .\lambda\test.py
-```
-
 This validates response shape generation for a deferred Discord interaction response.
 
 ## Notes
