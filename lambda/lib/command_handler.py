@@ -36,7 +36,7 @@ def get_instance_status(ec2_client, ec2_instanceid):
 def terraria_status(ec2_client, ec2_instanceid, app_id, token):
     state, public_ip = get_instance_status(ec2_client, ec2_instanceid)
 
-    message = f"🌹 Running at `{public_ip}:7777`" if state == 'running' else f"🥀 Server status: {state}"
+    message = f"🌹 Running at `{public_ip}`\nPort 7777: Normal world\nPort 7778: For the worthy world" if state == 'running' else f"🥀 Server status: {state}"
 
     patch_original_response(app_id, token, message)
 
@@ -49,7 +49,7 @@ def terraria_start(ec2_client, ec2_instanceid, app_id, token):
         waiter = ec2_client.get_waiter('instance_running')
         waiter.wait(InstanceIds=[ec2_instanceid], WaiterConfig={'Delay': 5, 'MaxAttempts': 20})
         _, public_ip = get_instance_status(ec2_client, ec2_instanceid)
-    message = f"🌹 Terraria server is up 😊\nConnect to: `{public_ip}:7777`"
+    message = f"🌹 Terraria server is up !\nConnect to: `{public_ip}`\nPort 7777: Normal world\nPort 7778: For the worthy world"
 
     patch_original_response(app_id, token, message)
 
